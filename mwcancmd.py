@@ -165,7 +165,7 @@ def BIC_chargemode(val): #0=charge, 1=discharge
     # print ("set direction charge")
     # Command Code 0x0100
     # Set Direction Charge
-    v = candev.BIC_chargemode()
+    v = candev.BIC_chargemode(val)
     print(v)
     return v
 
