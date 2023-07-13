@@ -23,6 +23,7 @@
 # macGH 18.06.2023  Version 0.1.0
 # macGH 19.06.2023  Version 0.1.1: Added checkcandevice
 # macGH 20.06.2023  Version 0.1.2: Added mycan.ini read device paramter
+# macGH 13.07.2023  Version 0.1.3: Added read of BIC2200 operation
 
 import os
 import can
@@ -646,11 +647,11 @@ class mwcan:
     #############################################################################
     ##BIC-2200 only - charge dischagre functions
     #############################################################################
-    def BIC_chargemode(self,val): #0=charge, 1=discharge
+    def BIC_chargemode(self,rw,val): #0=charge, 1=discharge
         logging.debug("set direction charge 0x0100")
         # Command Code 0x0100
         # Set Direction Charge
-        return self.can_read_write(0x00,0x01,1,val,1)
+        return self.can_read_write(0x00,0x01,rw,val,1)
 
     def BIC_discharge_v(self,rw,val):
         logging.debug("read/write discharge voltage setting 0x0120")
