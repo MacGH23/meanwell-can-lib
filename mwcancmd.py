@@ -11,7 +11,7 @@
 
 # macGH 15.06.2023  Version 0.2.3
 #       - support for Meanwell NPB-x Charger
-#       - new config area   
+#       - new config area
 # steve 16.06.2023  Version 0.2.4
 #       - fault and status queries    
 # macGH 18.06.2023  Changed to mwcan.py class
