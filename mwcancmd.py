@@ -29,11 +29,11 @@ from mwcan import *
 # Config
 # 0 = BIC-2200
 # 1 = NPM-abc0
-USEDMW = 0xFF
+USEDMW = 1
 
 # BIC-2200 --> "00" to "07"
 # NPM-abc0 --> "00" to "03"
-USEDID = ""
+USEDID = "03"
 
 # "" = default = "/dev/ttyACM0"
 # if you have another device specify here
@@ -88,6 +88,7 @@ def mwcan_commands():
     print("       typeread             -- read power supply type")
     print("       statusread           -- read power supply status")
     print("       faultread            -- read power supply fault status")    
+    print("       readscaling          -- read power supply fault status")    
     print("")
     print("       <value> = amps oder volts * 100 --> 25,66V = 2566")
     print("")
@@ -195,6 +196,14 @@ def tempread():
     print(v)
     return v
 
+def readscaling():
+    # print ("Read System Scaling factor")
+    # Command Code 0x00C0
+    # Read System Status
+    
+    v = candev.system_scaling_factor()
+    return v
+
 def statusread():
     # print ("Read System Status")
     # Command Code 0x00C1
@@ -240,6 +249,7 @@ def command_line_argument():
     elif sys.argv[1] in ['typeread']:  typeread()
     elif sys.argv[1] in ['statusread']:statusread()
     elif sys.argv[1] in ['faultread']: faultread()
+    elif sys.argv[1] in ['readscaling']: readscaling()
     elif sys.argv[1] in ['NPB_chargemode']: NPB_chargemode(int(sys.argv[2]))
     else:
         print("")
@@ -283,7 +293,7 @@ if logtoconsole == 1:
 
 candev = mwcan(USEDMW,USEDID,RS232DEV,LOGLEVEL)
 candev.can_up()
-print(candev.mwtype)
+print("Found Device: " + candev.mwtype)
 
 command_line_argument()
 

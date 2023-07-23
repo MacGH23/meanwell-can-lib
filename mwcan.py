@@ -74,6 +74,7 @@ DEV_NPB      = 1
 DEV_CAN0     = 0
 DEV_RS232    = 1
 
+
 #SYSTEM CONFIG BITS
 SYSTEM_CONFIG_CAN_CTRL       = 0
 SYSTEM_CONFIG_OPERATION_INIT = 1 #BIT1 + BIT2 --> 00 .. 11
@@ -358,7 +359,6 @@ class mwcan:
     # CAN function
     def can_up(self):
         self.can0found = self.checkcandevice("can0") 
-        #self.can0found = False
         
         if self.can0found < 2: #2 = fully up, #1 = created but not up, #0 = can0 not exists, mostly RS232 devices 
             if self.can0found == 0: 
@@ -390,6 +390,7 @@ class mwcan:
     # receive function
     def can_receive(self):
         msgr = str(self.can0.recv(0.5))
+        logging.debug(msgr)
         if msgr != "None":
             msgr_split = msgr.split()
             #Check if the CAN response is from our request
@@ -401,9 +402,15 @@ class mwcan:
                 decval = int(hexval,8)
             
             if msgr_split[7] == "4":
-                hexval = (msgr_split[11]+ msgr_split[10])
+                hexval = (msgr_split[11] + msgr_split[10])
                 decval = int(hexval,16)
             
+            #special format for scaling factor
+            if msgr_split[7] == "8":
+                hexval = bytearray.fromhex(msgr_split[15]+msgr_split[14]+msgr_split[13]+msgr_split[12]+msgr_split[11]+msgr_split[10])
+                decval = int(hexval.hex(),16)
+                hexval = hexval.hex() 
+
             logging.debug("Return HEX: " + hexval)
             logging.debug("Return DEC: " + str(decval))
             logging.debug("Return BIN: " + format(decval, '#016b'))
@@ -416,13 +423,18 @@ class mwcan:
     
     def can_receive_char(self):
         msgr = str(self.can0.recv(0.5))
+        logging.debug(msgr)
         if msgr != "None":
             msgr_split = msgr.split()
             #Check if the CAN response is from our request
             if msgr_split[3] != self.CAN_ADR_R:
                 return ""
             
-            s = bytearray.fromhex(msgr_split[10]+msgr_split[11]+msgr_split[12]+msgr_split[13]+msgr_split[14]+msgr_split[15]).decode()
+            if msgr_split[7] == "5":
+                s = bytearray.fromhex(msgr_split[10]+msgr_split[11]+msgr_split[12]).decode()
+
+            if msgr_split[7] == "8":
+                s = bytearray.fromhex(msgr_split[10]+msgr_split[11]+msgr_split[12]+msgr_split[13]+msgr_split[14]+msgr_split[15]).decode()
             logging.debug(s)
 
         else:
@@ -553,12 +565,30 @@ class mwcan:
         # Read Type of PSU
         return self.can_read_string(0x84,0x00,0x00,0x00)
 
+    def manu_factory_location(self):
+        logging.debug("read firmware version 0x0084")
+        # Command Code 0x0085
+        # Read Type of PSU
+        return self.can_read_string(0x85,0x00,0x00,0x00)
+
+    def manu_date(self):
+        logging.debug("read firmware version 0x0084")
+        # Command Code 0x0086
+        # Read Type of PSU
+        return self.can_read_string(0x86,0x00,0x00,0x00)
+
     def serial_read(self):
         logging.debug("read power supply serial 0x0087 + 0x0088")
         # Command Code 0x0087
         # Command Code 0x0088
         # Read Type of PSU
         return self.can_read_string(0x87,0x00,0x88,0x00)
+
+    def system_scaling_factor(self):
+        logging.debug("read scaling factors 0x00C0")
+        # Command Code 0x00C0
+        # Read system scaling factors 
+        return self.can_read_write(0xC0,0x00,0,0)
 
     def system_status(self):
         logging.debug("read system status 0x00C1")
