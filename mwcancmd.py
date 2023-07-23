@@ -46,7 +46,9 @@ RS232DEV = ""
 # INFO       20
 # DEBUG      10
 # NOTSET      0
-LOGLEVEL = 10
+LOGLEVEL   = 10
+logtofile    = 0
+logtoconsole = 1
 
 def on_exit():
     print("CLEAN UP ...")
@@ -259,6 +261,24 @@ if USEDMW == 0xFF:
 if USEDID == "":
     print("ERROR - YOU NEED TO CONFIGURE THE ID IN THE BEGINNING OF THIS SCRIPT")
     sys.exit(1)
+
+
+mylogs = logging.getLogger()
+mylogs.setLevel(LOGLEVEL)
+
+if logtofile == 1:
+    file = logging.FileHandler(self.logpath, mode='a')
+    file.setLevel(LOGLEVEL)
+    fileformat = logging.Formatter("%(asctime)s:%(module)s:%(levelname)s:%(message)s",datefmt="%H:%M:%S")
+    file.setFormatter(fileformat)
+    mylogs.addHandler(file)
+
+if logtoconsole == 1:
+    stream = logging.StreamHandler()
+    stream.setLevel(LOGLEVEL)
+    streamformat = logging.Formatter("%(asctime)s:%(module)s:%(levelname)s:%(message)s",datefmt="%H:%M:%S")
+    stream.setFormatter(streamformat)    
+    mylogs.addHandler(stream)
 
 
 candev = mwcan(USEDMW,USEDID,RS232DEV,LOGLEVEL)

@@ -336,7 +336,7 @@ class mwcan:
 
 
     def __init__(self, usedmwdev, mwcanid, devpath, loglevel):
-        logging.basicConfig(filename=logpath, encoding='utf-8', level=loglevel)
+        logging.basicConfig(level=loglevel, encoding='utf-8')
         if devpath == "": devpath = "/dev/ttyACM0" #just try if is is the common devpath
         self.CAN_DEVICE    = devpath
         self.USEDMWHW      = usedmwdev 
