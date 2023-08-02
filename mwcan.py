@@ -289,7 +289,7 @@ class mwcan:
                 f = 1
                 #can0 always found if slcand with RS232CAN is used, even when deleted
                 #workaround because of bug in ifcfg, check if up and running
-                logging.info("Found can0 interface. Check if up ... ")
+                logging.info("Found can0 interface. Check if already up ... ")
                 if interface['flags'] == "193<UP,RUNNING,NOARP> ":  
                     f = 2
                     logging.info("Found can0 interface. Already created.")
@@ -351,9 +351,9 @@ class mwcan:
         self.CAN_ADR   = int(CAN_ADR_S,16)
         self.CAN_ADR_R = CAN_ADR_S_R           #need string to compare of return of CAN
         
-        logging.debug(self.CAN_DEVICE)
-        logging.debug(self.CAN_ADR)
-        logging.debug(self.CAN_ADR_R)
+        logging.debug("CAN device  : " + self.CAN_DEVICE)
+        logging.debug("CAN adr to  : " + str(self.CAN_ADR))
+        logging.debug("CAN adr from: " + self.CAN_ADR_R)
 
     #########################################
     # CAN function
@@ -476,7 +476,7 @@ class mwcan:
             s2 = self.can_receive_char()
         
         s=s1+s2
-        logging.info(s)
+        logging.info("Found device: " + s)
         return s
 
     #############################################################################
