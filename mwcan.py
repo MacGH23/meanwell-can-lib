@@ -300,7 +300,9 @@ class mwcan:
         self.mwtype = val
         config = configparser.ConfigParser()
         config.sections()
-        config.read('mwcan.ini')
+        spath = os.path.dirname(os.path.realpath(__file__)) 
+        logging.debug("Ini Path: " + spath + '/mwcan.ini')
+        config.read(spath + '/mwcan.ini')
         if config.has_section(val): 
             self.dev_Voltage             = int(config.get(val, 'Voltage'))
             self.dev_MaxWatt             = int(config.get(val, 'MaxWatt'))

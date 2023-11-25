@@ -46,7 +46,7 @@ RS232DEV = ""
 # INFO       20
 # DEBUG      10
 # NOTSET      0
-LOGLEVEL   = 10
+LOGLEVEL   = 20
 logtofile    = 0
 logtoconsole = 1
 
