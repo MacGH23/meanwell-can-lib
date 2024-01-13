@@ -1,14 +1,14 @@
-# meanwell-can-lib
+# meanwell-can-lib for python
 Tool to control Meanwell CAN Devices Charger / Power Supplys and Charger via CAN Bus
 
 Tested with the Version BIC-2200-CAN-24 and NPB-1200-24 PSU/Charger
 
 Please note:  
-This python lib and tool controls read and write settings to the CAN device 
-It is not yet complete and also not fully tested. 
-Do not use without monitoring the device. 
-There is no error handling yet !!!
-Use at your own risk !
+This python lib and tool controls read and write settings to the CAN device.</br>
+It is not yet complete and also not fully tested. </br>
+Do not use without monitoring the device. </br>
+There is no error handling yet !!!</br>
+Use at your own risk !</br>
 
 mwcancmd.py sample application
 
@@ -39,4 +39,4 @@ mwcancmd.py sample application
 
        <value> = amps oder volts * 100 --> 25,66V = 2566 
         
-- All scripts are without any warranty. Use at your own risk
+All scripts are without any warranty. Use at your own risk
