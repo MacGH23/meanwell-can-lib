@@ -49,6 +49,7 @@ RS232DEV = ""
 LOGLEVEL   = 20
 logtofile    = 0
 logtoconsole = 1
+logpath = "mwcan.log"
 
 def on_exit():
     print("CLEAN UP ...")
@@ -277,7 +278,7 @@ mylogs = logging.getLogger()
 mylogs.setLevel(LOGLEVEL)
 
 if logtofile == 1:
-    file = logging.FileHandler(self.logpath, mode='a')
+    file = logging.FileHandler(logpath, mode='a')
     file.setLevel(LOGLEVEL)
     fileformat = logging.Formatter("%(asctime)s:%(module)s:%(levelname)s:%(message)s",datefmt="%H:%M:%S")
     file.setFormatter(fileformat)
