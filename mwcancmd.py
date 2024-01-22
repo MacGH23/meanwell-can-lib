@@ -49,7 +49,6 @@ RS232DEV = ""
 LOGLEVEL   = 20
 logtofile    = 0
 logtoconsole = 1
-logpath = "mwcan.log"
 
 def on_exit():
     print("CLEAN UP ...")
@@ -67,6 +66,7 @@ def mwcan_commands():
     print("")
     print("       on                   -- output on")
     print("       off                  -- output off")
+    print("       readonoff            -- read current on/off status")
     print("")
     print("       cvread               -- read charge voltage setting")
     print("       cvset <value>        -- set charge voltage")
@@ -98,6 +98,12 @@ def mwcan_commands():
 
 #########################################
 # Operation function
+
+def readoperation():#0=off, 1=on
+    print ("Read operation mode")
+    v = candev.operation(0,0)
+    print(v)
+    return v
 
 def operation(val):#0=off, 1=on
     print ("turn output on")
@@ -233,6 +239,7 @@ def command_line_argument():
     
     if   sys.argv[1] in ['on']:        operation(1)
     elif sys.argv[1] in ['off']:       operation(0)
+    elif sys.argv[1] in ['readonoff']: readoperation()
     elif sys.argv[1] in ['cvread']:    charge_voltage(0)
     elif sys.argv[1] in ['cvset']:     charge_voltage(1,int(sys.argv[2]))
     elif sys.argv[1] in ['ccread']:    charge_current(0)
@@ -278,7 +285,7 @@ mylogs = logging.getLogger()
 mylogs.setLevel(LOGLEVEL)
 
 if logtofile == 1:
-    file = logging.FileHandler(logpath, mode='a')
+    file = logging.FileHandler(self.logpath, mode='a')
     file.setLevel(LOGLEVEL)
     fileformat = logging.Formatter("%(asctime)s:%(module)s:%(levelname)s:%(message)s",datefmt="%H:%M:%S")
     file.setFormatter(fileformat)
