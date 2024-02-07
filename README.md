@@ -9,6 +9,8 @@ It is not yet complete and also not fully tested. </br>
 Do not use without monitoring the device. </br>
 There is no error handling yet !!!</br>
 Use at your own risk !</br>
+</br>
+Note: Do not modify the mycan.ini file ! This is for general information, not for configuration !</br>
 
 mwcancmd.py sample application
 
