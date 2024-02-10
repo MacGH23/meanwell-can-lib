@@ -24,6 +24,8 @@
 # macGH 19.06.2023  Version 0.1.1: Added checkcandevice
 # macGH 20.06.2023  Version 0.1.2: Added mycan.ini read device paramter
 # macGH 13.07.2023  Version 0.1.3: Added read of BIC2200 operation
+# macGH 10.02.2023  Version 0.1.4: Added can_set_ADR to change the address later if multible Devices are used
+
 
 import os
 import can
@@ -333,11 +335,18 @@ class mwcan:
         else:
             return -1
 
-
     def __init__(self, usedmwdev, mwcanid, devpath, loglevel):
         logging.basicConfig(level=loglevel, encoding='utf-8')
         if devpath == "": devpath = "/dev/ttyACM0" #just try if is is the common devpath
         self.CAN_DEVICE    = devpath
+        
+        self.can_set_ADR(usedmwdev, mwcanid)
+        
+        logging.debug("CAN device  : " + self.CAN_DEVICE)
+        logging.debug("CAN adr to  : " + str(self.CAN_ADR))
+        logging.debug("CAN adr from: " + self.CAN_ADR_R)
+
+    def can_set_ADR(self,usedmwdev, mwcanid):
         self.USEDMWHW      = usedmwdev 
         if usedmwdev==0: #BIC-2200 
             CAN_ADR_S   = "0x000C03" + mwcanid
@@ -348,10 +357,7 @@ class mwcan:
 
         self.CAN_ADR   = int(CAN_ADR_S,16)
         self.CAN_ADR_R = CAN_ADR_S_R           #need string to compare of return of CAN
-        
-        logging.debug("CAN device  : " + self.CAN_DEVICE)
-        logging.debug("CAN adr to  : " + str(self.CAN_ADR))
-        logging.debug("CAN adr from: " + self.CAN_ADR_R)
+        return
 
     #########################################
     # CAN function
