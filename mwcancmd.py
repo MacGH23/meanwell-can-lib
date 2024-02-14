@@ -29,7 +29,7 @@ from mwcan import *
 # Config
 # 0 = BIC-2200
 # 1 = NPM-abc0
-USEDMW = 1
+USEDMW = 0
 
 # BIC-2200 --> "00" to "07"
 # NPM-abc0 --> "00" to "03"
@@ -106,7 +106,7 @@ def readoperation():#0=off, 1=on
     return v
 
 def operation(val):#0=off, 1=on
-    print ("turn output on")
+    print ("turn output on=1 / off=0 ")
     v = candev.operation(1,val)
     print(v)
     return v
@@ -175,7 +175,7 @@ def BIC_chargemode(val): #0=charge, 1=discharge
     # print ("set direction charge")
     # Command Code 0x0100
     # Set Direction Charge
-    v = candev.BIC_chargemode(val)
+    v = candev.BIC_chargemode(1,val)
     print(v)
     return v
 
