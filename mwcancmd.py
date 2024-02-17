@@ -16,6 +16,7 @@
 #       - fault and status queries    
 # macGH 18.06.2023  Changed to mwcan.py class
 # macGH 19.06.2023  Fixed some parts 
+# macGH 16.02.2024  Added firmware read
 
 import os
 import can
@@ -29,7 +30,7 @@ from mwcan import *
 # Config
 # 0 = BIC-2200
 # 1 = NPM-abc0
-USEDMW = 0
+USEDMW = 1
 
 # BIC-2200 --> "00" to "07"
 # NPM-abc0 --> "00" to "03"
@@ -46,7 +47,7 @@ RS232DEV = ""
 # INFO       20
 # DEBUG      10
 # NOTSET      0
-LOGLEVEL   = 20
+LOGLEVEL     = 20
 logtofile    = 0
 logtoconsole = 1
 
@@ -87,6 +88,7 @@ def mwcan_commands():
     print("")
     print("       tempread             -- read power supply temperature")
     print("       typeread             -- read power supply type")
+    print("       serialread           -- read power supply serial number")
     print("       statusread           -- read power supply status")
     print("       faultread            -- read power supply fault status")    
     print("       readscaling          -- read power supply fault status")    
@@ -195,6 +197,23 @@ def typeread():
     print(v)
     return v
 
+def firmwareread():
+    # print ("read power supply type")
+    # Command Code 0x0084
+    # Read firmware version of PSU
+    v = candev.firmware_read()
+    print(v)
+    return v
+
+def serialread():
+    # print ("read power supply type")
+    # Command Code 0x0087
+    # Command Code 0x0088
+    # Read serial of PSU
+    v = candev.serial_read()
+    print(v)
+    return v
+
 def tempread():
     # print ("read power supply temperature")
     # Command Code 0x0062
@@ -255,6 +274,8 @@ def command_line_argument():
     elif sys.argv[1] in ['discharge']: BIC_chargemode(1)
     elif sys.argv[1] in ['tempread']:  tempread()
     elif sys.argv[1] in ['typeread']:  typeread()
+    elif sys.argv[1] in ['serialread']:serialread()
+    elif sys.argv[1] in ['firmwareread']:firmwareread()
     elif sys.argv[1] in ['statusread']:statusread()
     elif sys.argv[1] in ['faultread']: faultread()
     elif sys.argv[1] in ['readscaling']: readscaling()

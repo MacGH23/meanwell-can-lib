@@ -24,7 +24,8 @@
 # macGH 19.06.2023  Version 0.1.1: Added checkcandevice
 # macGH 20.06.2023  Version 0.1.2: Added mycan.ini read device paramter
 # macGH 13.07.2023  Version 0.1.3: Added read of BIC2200 operation
-# macGH 10.02.2023  Version 0.1.4: Added can_set_ADR to change the address later if multible Devices are used
+# macGH 10.02.2024  Version 0.1.4: Added can_set_ADR to change the address later if multible Devices are used
+# macGH 16.02.2024  Version 0.1.5: Added Firmware read
 
 
 import os
@@ -409,18 +410,30 @@ class mwcan:
                 hexval = (msgr_split[11] + msgr_split[10])
                 decval = int(hexval,16)
             
-            #special format for scaling factor
+            #special format for scaling factor and frimware version
             if msgr_split[7] == "8":
-                hexval = bytearray.fromhex(msgr_split[15]+msgr_split[14]+msgr_split[13]+msgr_split[12]+msgr_split[11]+msgr_split[10])
-                decval = int(hexval.hex(),16)
-                hexval = hexval.hex() 
+                if(msgr_split[8] == "84"): #Firmware
+                    i=10
+                    hexarray = ""
+                    while(msgr_split[i]) != "ff":
+                        hexarray = hexarray + msgr_split[i] 
+                        i+=1
+
+                    hexval = bytearray.fromhex(hexarray) #Currently only 2 Bytes
+                    decval = int(hexval.hex(),16)
+                    hexval = hexval.hex() 
+
+                if(msgr_split[8] == "c0"): #Scaling Factor
+                    hexval = bytearray.fromhex(msgr_split[15]+msgr_split[14]+msgr_split[13]+msgr_split[12]+msgr_split[11]+msgr_split[10])
+                    decval = int(hexval.hex(),16)
+                    hexval = hexval.hex() 
 
             logging.debug("Return HEX: " + hexval)
             logging.debug("Return DEC: " + str(decval))
             logging.debug("Return BIN: " + format(decval, '#016b'))
             
         else: 
-            logging.error("ERROR: TIMEOUT - NO MESSAGE RETURNED ! CHECK SETTINGS !")
+            logging.error("ERROR: TIMEOUT - NO MESSAGE RETURNED ! CHECK SETTINGS OR MESSAGE TYPE NOT SUPPORTED !")
             decval = -1
 
         return decval
@@ -480,7 +493,7 @@ class mwcan:
             s2 = self.can_receive_char()
         
         s=s1+s2
-        logging.info("Found device: " + s)
+        logging.info("Received String: " + s)
         return s
 
     #############################################################################
@@ -567,7 +580,7 @@ class mwcan:
         logging.debug("read firmware version 0x0084")
         # Command Code 0x0084
         # Read Type of PSU
-        return self.can_read_string(0x84,0x00,0x00,0x00)
+        return self.can_read_write(0x84,0x00,0,0)
 
     def manu_factory_location(self):
         logging.debug("read firmware version 0x0084")
@@ -585,7 +598,7 @@ class mwcan:
         logging.debug("read power supply serial 0x0087 + 0x0088")
         # Command Code 0x0087
         # Command Code 0x0088
-        # Read Type of PSU
+        # Read serial number of PSU
         return self.can_read_string(0x87,0x00,0x88,0x00)
 
     def system_scaling_factor(self):
