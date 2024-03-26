@@ -12,11 +12,11 @@
 # macGH 15.06.2023  Version 0.2.3
 #       - support for Meanwell NPB-x Charger
 #       - new config area
-# steve 16.06.2023  Version 0.2.4
-#       - fault and status queries    
-# macGH 18.06.2023  Changed to mwcan.py class
-# macGH 19.06.2023  Fixed some parts 
-# macGH 16.02.2024  Added firmware read
+# macGH 16.06.2023  Version 0.2.4: fault and status queries    
+# macGH 18.06.2023  Version 0.2.5: Changed to mwcan.py class
+# macGH 19.06.2023  Version 0.2.6: Fixed some parts 
+# macGH 16.02.2024  Version 0.2.7: Added firmware read
+# macGH 26.03.2024  Version 0.2.8: Added systemconfig read write
 
 import os
 import can
@@ -30,7 +30,7 @@ from mwcan import *
 # Config
 # 0 = BIC-2200
 # 1 = NPM-abc0
-USEDMW = 1
+USEDMW = 0
 
 # BIC-2200 --> "00" to "07"
 # NPM-abc0 --> "00" to "03"
@@ -92,6 +92,7 @@ def mwcan_commands():
     print("       statusread           -- read power supply status")
     print("       faultread            -- read power supply fault status")    
     print("       readscaling          -- read power supply fault status")    
+    print("       systemconfig         -- read system config")    
     print("")
     print("       <value> = amps oder volts * 100 --> 25,66V = 2566")
     print("")
@@ -239,13 +240,22 @@ def statusread():
     candev.decode_system_status(v)
     return v
         
+def systemconfig(rw,val):
+    # print ("Read System config")
+    # Command Code 0x00C2
+    # Read System config
+    
+    v = candev.system_config(rw,val) 
+    candev.decode_system_config(v)
+    return v
+
 def faultread():
     # print ("Read System Fault Status")
     # Command Code 0x0040
     # Read System Fault Status
     
-    v = candev.system_status() 
-    candev.decode_system_status(v)
+    v = candev.fault_status_read() 
+    candev.decode_fault_status(v)
     return v
 
 def command_line_argument():
@@ -274,11 +284,13 @@ def command_line_argument():
     elif sys.argv[1] in ['discharge']: BIC_chargemode(1)
     elif sys.argv[1] in ['tempread']:  tempread()
     elif sys.argv[1] in ['typeread']:  typeread()
-    elif sys.argv[1] in ['serialread']:serialread()
+    elif sys.argv[1] in ['serialread']: serialread()
     elif sys.argv[1] in ['firmwareread']:firmwareread()
-    elif sys.argv[1] in ['statusread']:statusread()
-    elif sys.argv[1] in ['faultread']: faultread()
-    elif sys.argv[1] in ['readscaling']: readscaling()
+    elif sys.argv[1] in ['statusread']: statusread()
+    elif sys.argv[1] in ['faultread']:  faultread()
+    elif sys.argv[1] in ['readscaling']:readscaling()
+    elif sys.argv[1] in ['systemconfigread']:systemconfig(0,0)
+    elif sys.argv[1] in ['systemconfigset'] :systemconfig(1,int(sys.argv[2]))
     elif sys.argv[1] in ['NPB_chargemode']: NPB_chargemode(int(sys.argv[2]))
     else:
         print("")

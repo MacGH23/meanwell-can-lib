@@ -26,6 +26,7 @@
 # macGH 13.07.2023  Version 0.1.3: Added read of BIC2200 operation
 # macGH 10.02.2024  Version 0.1.4: Added can_set_ADR to change the address later if multible Devices are used
 # macGH 16.02.2024  Version 0.1.5: Added Firmware read
+# macGH 26.03.2024  Version 0.1.6: Update system config
 
 
 import os
@@ -215,17 +216,28 @@ class mwcan:
 
     def decode_system_config(self,val):
         print("BIT flags: " + format(val, '#016b'))
+        c = val & 0b00000001
         if self.USEDMWHW in [0]:
-            if not is_bit(val,0):     print("CONFIG BIT  0: The output voltage/current defined by control over SVR")
-            else:                     print("CONFIG BIT  0: The output voltage, current, ON/OFF control defined by control")
-        if self.USEDMWHW in [1]:        print("CONFIG BIT  0: NOT USED")
+            if c == 0:                print("CONFIG BIT    0: The output voltage/current defined by control over SVR")
+            if c == 1:                print("CONFIG BIT    0: The output voltage, current, ON/OFF control defined by control CAN MODE")
+        if self.USEDMWHW in [1]:      print("CONFIG BIT    0: NOT USED")
         
-        c = val >> 1
-        if c == 0:                    print("CONFIG BIT 21: Power OFF, pre-set 0x00(OFF)")    
-        if c == 1:                    print("CONFIG BIT 21: Power ON, pre-set0x01(ON)")    
-        if c == 2:                    print("CONFIG BIT 21: Pre-set is previous set value")    
-        if c == 3:                    print("CONFIG BIT 21: not used, reserved")    
+        c = (val >> 1) & 0b00000011
+        if c == 0:                    print("CONFIG BIT  2-1: Power OFF, pre-set 0x00(OFF)")    
+        if c == 1:                    print("CONFIG BIT  2-1: Power ON, pre-set0x01(ON)")    
+        if c == 2:                    print("CONFIG BIT  2-1: Pre-set is previous set value")    
+        if c == 3:                    print("CONFIG BIT  2-1: not used, reserved")    
        
+        c = (val >> 7) & 0b00000011
+        if c == 0:                    print("CONFIG BIT  8-9: Immediate. Changes to parameters are written to EEPROM (default)")    
+        if c == 1:                    print("CONFIG BIT  8-9: 1 minute delay. Write changes to EEPROM if all parameters remain unchanged for 1 minute")    
+        if c == 2:                    print("CONFIG BIT  8-9: 10 minute delay. Write changes to EEPROM if all parameters remain unchanged for 10 minute")    
+        if c == 3:                    print("CONFIG BIT  8-9: not used, reserved")    
+
+        c = (val >> 9) & 0b00000001
+        if c == 0:                    print("CONFIG BIT   10: Enable. Parameters to be saved into EEPROM (default)")    
+        if c == 1:                    print("CONFIG BIT   10: Disable. Parameters NOT to be saved into EEPROM")    
+
     def decode_chg_status(self,val):
         if self.USEDMWHW == 0: return
         print("BIT flags: " + format(val, '#016b'))
