@@ -38,6 +38,13 @@ mwcancmd.py sample application
        discharge            -- set direction discharge battery
 
        tempread             -- read power supply temperature
+       typeread             -- read power supply type
+       serialread           -- read power supply serial number
+       statusread           -- read status
+       faultread            -- read fault status
+       readscaling          -- read scaling factors  
+       systemconfigread     -- read system config  
+       systemconfigset <value> -- write system config    
 
        <value> = amps oder volts * 100 --> 25,66V = 2566 
         
