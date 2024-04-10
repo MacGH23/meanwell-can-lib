@@ -290,6 +290,12 @@ class mwcan:
             if not is_bit(val,15):     print("CHG    BIT 15: NO time out in float mode")
             else:                      print("CHG    BIT 15: Float mode timed out")
 
+    def decode_firmware(self,val):
+        MCU1 = (val & 0xFF00) >> 8
+        MCU2 = val & 0x00FF
+        print("Firmware: MCU1: " + str(MCU1) + " - MCU2: " + str(MCU2))
+        return str(MCU1) + "-" + str(MCU2)
+
 ##################################################################################################################################################
 ##################################################################################################################################################
 

@@ -88,6 +88,7 @@ def mwcan_commands():
     print("")
     print("       tempread                -- read power supply temperature")
     print("       typeread                -- read power supply type")
+    print("       firmwareread            -- read power supply firmware")
     print("       serialread              -- read power supply serial number")
     print("       statusread              -- read status")
     print("       faultread               -- read fault status")    
@@ -204,6 +205,7 @@ def firmwareread():
     # Read firmware version of PSU
     v = candev.firmware_read()
     print(v)
+    candev.decode_firmware(v)
     return v
 
 def serialread():
@@ -312,7 +314,6 @@ if USEDMW == 0xFF:
 if USEDID == "":
     print("ERROR - YOU NEED TO CONFIGURE THE ID IN THE BEGINNING OF THIS SCRIPT")
     sys.exit(1)
-
 
 mylogs = logging.getLogger()
 mylogs.setLevel(LOGLEVEL)
