@@ -234,7 +234,7 @@ class mwcan:
         if c == 2:                    print("CONFIG BIT  8-9: 10 minute delay. Write changes to EEPROM if all parameters remain unchanged for 10 minute")    
         if c == 3:                    print("CONFIG BIT  8-9: not used, reserved")    
 
-        c = (val >> 9) & 0b00000001
+        c = (val >> SYSTEM_CONFIG_EEP_OFF) & 0b00000001
         if c == 0:                    print("CONFIG BIT   10: Enable. Parameters to be saved into EEPROM (default)")    
         if c == 1:                    print("CONFIG BIT   10: Disable. Parameters NOT to be saved into EEPROM")    
 
