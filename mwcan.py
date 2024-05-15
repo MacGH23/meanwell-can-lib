@@ -27,6 +27,7 @@
 # macGH 10.02.2024  Version 0.1.4: Added can_set_ADR to change the address later if multible Devices are used
 # macGH 16.02.2024  Version 0.1.5: Added Firmware read
 # macGH 26.03.2024  Version 0.1.6: Update system config
+# macGH 13.05.2024  Version 0.1.7: Set Output to 0 too low or high, val is changed to min/max out value of device, added decode NPB Curve
 
 
 import os
@@ -96,6 +97,7 @@ CURVE_CONFIG_CUVE  =  7
 CURVE_CONFIG_CCTOE =  8
 CURVE_CONFIG_CVTOE =  9
 CURVE_CONFIG_FVTOE = 10
+CURVE_CONFIG_RSTE  = 11
 
 #NPB CHG STATUS
 CHG_STATUS_FULLM       =  0
@@ -237,6 +239,40 @@ class mwcan:
         c = (val >> SYSTEM_CONFIG_EEP_OFF) & 0b00000001
         if c == 0:                    print("CONFIG BIT   10: Enable. Parameters to be saved into EEPROM (default)")    
         if c == 1:                    print("CONFIG BIT   10: Disable. Parameters NOT to be saved into EEPROM")    
+
+    def decode_curve_config(self,val): #only NPB
+        print("BIT flags: " + format(val, '#016b'))
+        c = val & 0b00000011
+        if c == 0:                    print("CONFIG BIT  1-0: CUVS  Customized charging curve(default)")    
+        if c == 1:                    print("CONFIG BIT  1-0: CUVS  Preset charging curve 1")    
+        if c == 2:                    print("CONFIG BIT  1-0: CUVS  Preset charging curve 2")    
+        if c == 3:                    print("CONFIG BIT  1-0: CUVS  Preset charging curve 3")    
+
+        c = (val >> 2) & 0b00000011
+        if c == 0:                    print("CONFIG BIT  2-3: TCS   disable")    
+        if c == 1:                    print("CONFIG BIT  2-3: TCS   -3mV/°C/cell(default)")    
+        if c == 2:                    print("CONFIG BIT  2-3: TCS   -4mV/°C/cell")    
+        if c == 3:                    print("CONFIG BIT  2-3: TCS   -5mV/°C/cell")    
+  
+        c = (val >> CURVE_CONFIG_CUVE) & 0b00000001
+        if c == 0:                    print("CONFIG BIT    7: CUVE  Disabled, power supply mode")    
+        if c == 1:                    print("CONFIG BIT    7: CUVE  Enabled, charger mode(defaut)")    
+
+        c = (val >> CURVE_CONFIG_CCTOE) & 0b00000001
+        if c == 0:                    print("CONFIG BIT    8: CCTOE Disabled")    
+        if c == 1:                    print("CONFIG BIT    8: CCTOE Enabled")    
+
+        c = (val >> CURVE_CONFIG_CVTOE) & 0b00000001
+        if c == 0:                    print("CONFIG BIT    9: CVTOE Disabled")    
+        if c == 1:                    print("CONFIG BIT    9: CVTOE Enabled")    
+
+        c = (val >> CURVE_CONFIG_FVTOE) & 0b00000001
+        if c == 0:                    print("CONFIG BIT   10: FVTOE Disabled")    
+        if c == 1:                    print("CONFIG BIT   10: FVTOE Enabled")    
+
+        c = (val >> CURVE_CONFIG_RSTE) & 0b00000001
+        if c == 0:                    print("CONFIG BIT   11: RSTE  Disabled")    
+        if c == 1:                    print("CONFIG BIT   11: RSTE  Enabled")    
 
     def decode_chg_status(self,val):
         if self.USEDMWHW == 0: return
@@ -529,9 +565,9 @@ class mwcan:
         # Read Charge Voltage
         if rw == 1:
             if val < self.dev_MinChargeVoltage:
-                return -1
+                val = self.dev_MinChargeVoltage
             if val > self.dev_MaxChargeVoltage:
-                return -2
+                val = self.dev_MaxChargeVoltage
         
         return self.can_read_write(0x20,0x00,rw,val)
    
@@ -541,9 +577,9 @@ class mwcan:
         # Set Charge Current
         if rw == 1:
             if val < self.dev_MinChargeCurrent:
-                return -1
+                val = self.dev_MinChargeCurrent
             if val > self.dev_MaxChargeCurrent:
-                return -2
+                val = self.dev_MaxChargeCurrent
         
         return self.can_read_write(0x30,0x00,rw,val)
     
@@ -665,7 +701,14 @@ class mwcan:
         # Read/Write Taper current setting value of charging curve
         return self.can_read_write(0xB3,0x00,rw,val)
 
-    def NPB_curve_config(self,rw,pos,val):
+    def NPB_curve_config(self,rw,val):
+        logging.debug("Set CURVE CONFIG of NPB Device 0x00B4")
+        # Command Code 0x00B4
+        # first Read the current value, change and verify
+
+        return self.can_read_write(0xB4,0x00,rw,val)
+
+    def NPB_curve_config_pos(self,rw,pos,val):
         logging.debug("Set Bits in CURVE CONFIG of NPB Device 0x00B4")
         # Command Code 0x00B4
         # first Read the current value, change and verify
@@ -725,9 +768,9 @@ class mwcan:
         # Set Discharge Voltage
         if rw == 1:
             if val < self.dev_MinDisChargeVoltage:
-                return -1
+                val = self.dev_MinDisChargeVoltage
             if val > self.dev_MaxDisChargeVoltage:
-                return -2
+                val = self.dev_MaxDisChargeVoltage
         
         return self.can_read_write(0x20,0x01,rw,val)
     
@@ -737,9 +780,9 @@ class mwcan:
         # Read Discharge Current
         if rw == 1:
             if val < self.dev_MinDisChargeCurrent:
-                return -1
+                val = self.dev_MinDisChargeCurrent
             if val > self.dev_MaxDisChargeCurrent:
-                return -2
+                val = self.dev_MaxDisChargeCurrent
         
         return self.can_read_write(0x30,0x01,rw,val)
 

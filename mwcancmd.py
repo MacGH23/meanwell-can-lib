@@ -17,6 +17,7 @@
 # macGH 19.06.2023  Version 0.2.6: Fixed some parts 
 # macGH 16.02.2024  Version 0.2.7: Added firmware read
 # macGH 26.03.2024  Version 0.2.8: Added systemconfig read write
+# macGH 13.05.2024  Version 0.2.9: Added NPB config curve read
 
 import os
 import can
@@ -30,7 +31,7 @@ from mwcan import *
 # Config
 # 0 = BIC-2200
 # 1 = NPM-abc0
-USEDMW = 0
+USEDMW = 1
 
 # BIC-2200 --> "00" to "07"
 # NPM-abc0 --> "00" to "03"
@@ -95,6 +96,8 @@ def mwcan_commands():
     print("       readscaling             -- read scaling factors")    
     print("       systemconfigread        -- read system config")    
     print("       systemconfigset <value> -- write system config")    
+    print("       NPB_chargemode <value>  -- Set PSU = 0 or Chargermode = 1")    
+    print("       NPB_readcurve           -- read NPB curve config")    
     print("")
     print("       <value> = amps oder volts * 100 --> 25,66V = 2566")
     print("")
@@ -128,7 +131,7 @@ def charge_current(rw,val=0x00): #0=read, 1=set
     # print ("read/set charge current")
     # Command Code 0x0030
     # Read Charge Voltage
-    if (rw == 1) and (val == 0x00) : return -1
+    #if (rw == 1) and (val == 0x00) : return -1
     v = candev.i_out_set(rw,val)
     print(v)
     return v
@@ -183,10 +186,17 @@ def BIC_chargemode(val): #0=charge, 1=discharge
     print(v)
     return v
 
+def NPB_readcurve():
+    # print ("Set PSU or Charger Mode to NPB Device")
+    # Command Code 0x00B4
+    v = candev.NPB_curve_config(0,0)
+    candev.decode_curve_config(v)
+    return v
+
 def NPB_chargemode(rw, val=0xFF):
     # print ("Set PSU or Charger Mode to NPB Device")
     # Command Code 0x00B4
-    v = candev.NPB_curve_config(1,CURVE_CONFIG_CUVE,val) #Bit 7 should be 0
+    v = candev.NPB_curve_config_pos(1,CURVE_CONFIG_CUVE,val) #Bit 7 should be 0
     print(v)
     return v
 
@@ -294,6 +304,7 @@ def command_line_argument():
     elif sys.argv[1] in ['systemconfigread']:systemconfig(0,0)
     elif sys.argv[1] in ['systemconfigset'] :systemconfig(1,int(sys.argv[2]))
     elif sys.argv[1] in ['NPB_chargemode']: NPB_chargemode(int(sys.argv[2]))
+    elif sys.argv[1] in ['NPB_readcurve']: NPB_readcurve()
     else:
         print("")
         print("Unknown first argument '" + sys.argv[1] + "'")
