@@ -339,12 +339,13 @@ class mwcan:
         f = 0
         for name, interface in ifcfg.interfaces().items():
             # Check for Can0 interface
+            logging.debug("can checkcandevice: " + name + " - " + str(interface))
             if interface['device'] == val:
                 f = 1
                 #can0 always found if slcand with RS232CAN is used, even when deleted
                 #workaround because of bug in ifcfg, check if up and running
                 logging.info("Found can0 interface. Check if already up ... ")
-                if interface['flags'] == "193<UP,RUNNING,NOARP> ":  
+                if(interface['flags'] == "193<UP,RUNNING,NOARP> "):  
                     f = 2
                     logging.info("Found can0 interface. Already created.")
         return f
@@ -423,11 +424,14 @@ class mwcan:
         if self.can0found < 2: #2 = fully up, #1 = created but not up, #0 = can0 not exists, mostly RS232 devices 
             if self.can0found == 0: 
                 os.system('sudo slcand -f -s5 -o ' + self.CAN_DEVICE) #looks like a RS232 device, bring it up 
+                logging.debug("can_up: RS232 DEVICE ?")
 
+            logging.debug("can_up: Link Set")
             os.system('sudo ip link set can0 up type can bitrate 250000')
             os.system('sudo ip link set up can0 txqueuelen 1000')
         
         # init interface for using with this class
+        logging.debug("can_up: init SocketCan")
         self.can0 = can.interface.Bus(channel = 'can0', bustype = 'socketcan')
         
         #Get Meanwell device and set parameter from mwcan.ini file
@@ -440,6 +444,7 @@ class mwcan:
     def can_down(self):
         self.can0.shutdown() #Shutdown our interface
         if self.can0found < 2: #only shutdown system can0 if it was created by us
+            logging.info("can_down: shutdown CAN0")
             os.system('sudo ip link set can0 down')
             os.system('sudo ip link del can0')
         else:

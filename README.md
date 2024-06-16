@@ -12,6 +12,11 @@ Use at your own risk !</br>
 </br>
 Note: Do not modify the mycan.ini file ! This is for general information, not for configuration !</br>
 
+**CAN devices hints:<br>**
+If you see problems during init of CAN device, check / add an entry in<br>
+` sudo nano /etc/host`  <br>
+127.0.1.1       [Hostname of your Raspberry] <br>
+
 mwcancmd.py sample application
 
 	   Usage: ./mwcancmd.py parameter value
