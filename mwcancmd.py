@@ -18,6 +18,7 @@
 # macGH 16.02.2024  Version 0.2.7: Added firmware read
 # macGH 26.03.2024  Version 0.2.8: Added systemconfig read write
 # macGH 13.05.2024  Version 0.2.9: Added NPB config curve read
+# macGH 24.09.2024  Version 0.3.0: Added BIC read Fanspeed
 
 import os
 import can
@@ -31,7 +32,7 @@ from mwcan import *
 # Config
 # 0 = BIC-2200
 # 1 = NPM-abc0
-USEDMW = 1
+USEDMW = 0
 
 # BIC-2200 --> "00" to "07"
 # NPM-abc0 --> "00" to "03"
@@ -92,6 +93,8 @@ def mwcan_commands():
     print("       firmwareread            -- read power supply firmware")
     print("       serialread              -- read power supply serial number")
     print("       statusread              -- read status")
+    print("       fan1                    -- read fanspeed1")
+    print("       fan2                    -- read fanspeed2")
     print("       faultread               -- read fault status")    
     print("       readscaling             -- read scaling factors")    
     print("       systemconfigread        -- read system config")    
@@ -252,6 +255,20 @@ def statusread():
     candev.decode_system_status(v)
     return v
         
+def readfan1():
+    # print ("Read fan1")
+    # Command Code 0x0070
+    v = candev.BIC_fanspeed1()
+    print(v)
+    return v
+
+def readfan2():
+    # print ("Read fan2")
+    # Command Code 0x0071
+    v = candev.BIC_fanspeed2()
+    print(v)
+    return v
+
 def systemconfig(rw,val):
     # print ("Read System config")
     # Command Code 0x00C2
@@ -299,6 +316,8 @@ def command_line_argument():
     elif sys.argv[1] in ['serialread']: serialread()
     elif sys.argv[1] in ['firmwareread']:firmwareread()
     elif sys.argv[1] in ['statusread']: statusread()
+    elif sys.argv[1] in ['fan1']:       readfan1()
+    elif sys.argv[1] in ['fan2']:       readfan2()
     elif sys.argv[1] in ['faultread']:  faultread()
     elif sys.argv[1] in ['readscaling']:readscaling()
     elif sys.argv[1] in ['systemconfigread']:systemconfig(0,0)

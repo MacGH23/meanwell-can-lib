@@ -28,6 +28,7 @@
 # macGH 16.02.2024  Version 0.1.5: Added Firmware read
 # macGH 26.03.2024  Version 0.1.6: Update system config
 # macGH 13.05.2024  Version 0.1.7: Set Output to 0 too low or high, val is changed to min/max out value of device, added decode NPB Curve
+# macGH 24.09.2024  Version 0.1.8: Addad Fanspeed for BIC2200
 
 
 import os
@@ -398,7 +399,7 @@ class mwcan:
         self.CAN_DEVICE    = devpath
         
         self.can_set_ADR(usedmwdev, mwcanid)
-        
+      
         logging.debug("CAN device  : " + self.CAN_DEVICE)
         logging.debug("CAN adr to  : " + str(self.CAN_ADR))
         logging.debug("CAN adr from: " + self.CAN_ADR_R)
@@ -761,6 +762,18 @@ class mwcan:
     #############################################################################
     ##BIC-2200 only - charge dischagre functions
     #############################################################################
+    def BIC_fanspeed1(self): 
+        logging.debug("set direction charge 0x0100")
+        # Command Code 0x0070
+        # read fanspeed 1
+        return self.can_read_write(0x70,0x00,0,0)
+
+    def BIC_fanspeed2(self): 
+        logging.debug("set direction charge 0x0100")
+        # Command Code 0x0071
+        # read fanspeed 2
+        return self.can_read_write(0x71,0x00,0,0)
+
     def BIC_chargemode(self,rw,val): #0=charge, 1=discharge
         logging.debug("set direction charge 0x0100")
         # Command Code 0x0100
