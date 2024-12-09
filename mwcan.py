@@ -419,7 +419,7 @@ class mwcan:
 
     #########################################
     # CAN function
-    def can_up(self):
+    def can_up(self,readini=True):
         self.can0found = self.checkcandevice("can0") 
         
         if self.can0found < 2: #2 = fully up, #1 = created but not up, #0 = can0 not exists, mostly RS232 devices 
@@ -430,15 +430,16 @@ class mwcan:
             logging.debug("can_up: Link Set")
             os.system('sudo ip link set can0 up type can bitrate 250000')
             os.system('sudo ip link set up can0 txqueuelen 1000')
-        
+
         # init interface for using with this class
         logging.debug("can_up: init SocketCan")
         self.can0 = can.interface.Bus(channel = 'can0', bustype = 'socketcan')
         
-        #Get Meanwell device and set parameter from mwcan.ini file
         t = self.type_read().strip()
-        if self.mwcaniniread(t) == -1:
-            raise Exception("MEANWELL DEVICE NOT FOUND")
+        if(readini==True):
+            #Get Meanwell device and set parameter from mwcan.ini file
+            if self.mwcaniniread(t) == -1:
+                raise Exception("MEANWELL DEVICE NOT FOUND")
         
         return t
         
@@ -451,12 +452,17 @@ class mwcan:
         else:
             logging.info("can0 was externally created. Not removing it.")
 
+    def can_restart(self):
+        #In case of critical error and bus can not resume, restart the bus
+        logging.info("can_restart bus")
+        self.can_down()
+        self.can_up(False)
 
     #########################################
     # receive function
     def can_receive(self):
         msgr = str(self.can0.recv(0.5))
-        logging.debug(msgr)
+        logging.debug("CAN RECEIVE: " + msgr)
         if msgr != "None":
             msgr_split = msgr.split()
             #Check if the CAN response is from our request
@@ -525,10 +531,12 @@ class mwcan:
     # Read Write operation function
     def can_read_write(self,lobyte,hibyte,rw,val,count=2):
         if rw==0:
+            logging.debug("can_read_write -> READ")
             msg = can.Message(arbitration_id=self.CAN_ADR, data=[lobyte,hibyte], is_extended_id=True)
             self.can0.send(msg)
             v = self.can_receive()
         else:
+            logging.debug("can_read_write -> WRITE")
             valhighbyte = val >> 8
             vallowbyte  = val & 0xFF
             if count == 1: #1 byte to send
@@ -537,7 +545,7 @@ class mwcan:
                 msg = can.Message(arbitration_id=self.CAN_ADR, data=[lobyte,hibyte,vallowbyte,valhighbyte], is_extended_id=True)
             self.can0.send(msg)
             v = val
-            
+
         return v
     
     def can_read_string(self,lobyte,hibyte,lobyte2,hibyte2):
