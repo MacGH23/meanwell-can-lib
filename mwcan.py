@@ -142,7 +142,7 @@ class mwcan:
     #########################################
     # Decode Bitstring to text
     def decode_fault_status(self,val):
-        print("BIT flags: " + format(val, '#016b'))
+        print("BIT flags: " + format(val, '#018b'))
         if self.USEDMWHW in [0]:
             if not is_bit(val,0):     print("FAULT  BIT  0: FAN working normally")
             else:                     print("FAULT  BIT  0: FAN locked")
@@ -181,7 +181,7 @@ class mwcan:
             else:                     print("FAULT  BIT  8: HV over voltage protected")
 
     def decode_system_status(self,val):
-        print("BIT flags: " + format(val, '#016b'))
+        print("BIT flags: " + format(val, '#018b'))
         if self.USEDMWHW in [0]:
             if not is_bit(val,0):     print("STATUS BIT  0: Current device is Slave")
             else:                     print("STATUS BIT  0: Current device is Master")
@@ -218,7 +218,7 @@ class mwcan:
         print("STATUS BIT  7: NOT USED")
 
     def decode_system_config(self,val):
-        print("BIT flags: " + format(val, '#016b'))
+        print("BIT flags: " + format(val, '#018b'))
         c = val & 0b00000001
         if self.USEDMWHW in [0]:
             if c == 0:                print("CONFIG BIT    0: The output voltage/current defined by control over SVR")
@@ -242,7 +242,7 @@ class mwcan:
         if c == 1:                    print("CONFIG BIT   10: Disable. Parameters NOT to be saved into EEPROM")    
 
     def decode_curve_config(self,val): #only NPB
-        print("BIT flags: " + format(val, '#016b'))
+        print("BIT flags: " + format(val, '#018b'))
         c = val & 0b00000011
         if c == 0:                    print("CONFIG BIT  1-0: CUVS  Customized charging curve(default)")    
         if c == 1:                    print("CONFIG BIT  1-0: CUVS  Preset charging curve 1")    
@@ -277,7 +277,7 @@ class mwcan:
 
     def decode_chg_status(self,val):
         if self.USEDMWHW == 0: return
-        print("BIT flags: " + format(val, '#016b'))
+        print("BIT flags: " + format(val, '#018b'))
         if self.USEDMWHW in [1]:
             if not is_bit(val,0):     print("CHG    BIT  0: Not fully charged")
             else:                     print("CHG    BIT  0: Fully charged")
@@ -497,7 +497,7 @@ class mwcan:
 
             logging.debug("Return HEX: " + hexval)
             logging.debug("Return DEC: " + str(decval))
-            logging.debug("Return BIN: " + format(decval, '#016b'))
+            logging.debug("Return BIN: " + format(decval, '#018b'))
             
         else: 
             logging.error("ERROR: TIMEOUT - NO MESSAGE RETURNED ! CHECK SETTINGS OR MESSAGE TYPE NOT SUPPORTED !")
